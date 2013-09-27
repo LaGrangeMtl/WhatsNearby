@@ -17,17 +17,17 @@ Basic usage
 
 First, be sure to include all the above libraries. Then, include WhatsNearby :
 ````html
-    <script src="js/WhatsNearby.js" type="text/javascript"></script>
+<script src="js/WhatsNearby.js" type="text/javascript"></script>
 ````
 
 WhatsNearby must be attached to an html element :
 ````html
-    <div id="wn"></div>
+<div id="wn"></div>
 ````
 
 Using jQuery, setup WhatsNearby on the selected element :
 ````js
-    $("#wn").whatsnearby();
+$("#wn").whatsnearby();
 ````
 
 You can customize WhatsNearby using an options argument (more details on all options will follow):
