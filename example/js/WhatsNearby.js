@@ -22,6 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*
  * Dependencies
+ * - jQuery
  * - Google Maps Javascript API v3
  * - Google Places API
  * - ES5 Shim
@@ -81,8 +82,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			$(this.elem).width(o.width).height(o.height);
 
-			if($(this).attr("data-address") != "") {
-				address = $(this).attr("data-address");
+			if($(this.elem).attr("data-address")) {
+				o.address = $(this.elem).attr("data-address");
 			}
 
 			if(o.address == "") {

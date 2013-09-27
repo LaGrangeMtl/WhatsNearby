@@ -22,11 +22,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*
  * Dependencies
+ * - jQuery
  * - Google Maps Javascript API v3
  * - Google Places API
  * - ES5 Shim
  * - ES5 Sham
- * 
  */
 
 ;(function($){
@@ -82,8 +82,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			$(this.elem).width(o.width).height(o.height);
 
-			if($(this).attr("data-address") != "") {
-				address = $(this).attr("data-address");
+			if($(this.elem).attr("data-address")) {
+				o.address = $(this.elem).attr("data-address");
 			}
 
 			if(o.address == "") {
@@ -117,7 +117,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//		String representing a physical address (Eg: 1234 Brown Street, 
 		//		Mtl)
 		//
-		// This function uses Google Geocoder to parse the address and return
+		// This function uses Google Geocoder to parse the address and returns
 		// its LatLng coords.
 		//=====================================================================
 		_locationFound: function(results, status){
@@ -127,6 +127,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				console.log("An error occured while geocoding the address.");
 			}
 		},
+
+		//=====================================================================
+		// _setupMap : Private Function
+		//
+		// @params : lat
+		//		Number value containing the latitude coordinate of a position
+		//
+		// @params : lng
+		//		Number value containing the longitude coordinate of a position
+		//
+		// Using Lat and Lng passed as parameters, this function generates a
+		// Google Map. It places a marker on the center position (if 
+		// placeMainMarker is set in the options) and searches for Places around
+		// the center of the map (again only if places types are passed in 
+		// options).
+		// 
+		//=====================================================================
 		_setupMap: function(lat, lng){
 			var o = this.options;
 			var mapOptions = {
@@ -143,6 +160,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				this._searchPlaces(lat, lng);
 			}
 		},
+
+		//=====================================================================
+		// _placeMainMarker : Private Function
+		//
+		// @params : lat
+		//		Number value containing the latitude coordinate of a position
+		//
+		// @params : lng
+		//		Number value containing the longitude coordinate of a position
+		//
+		// Using Lat and Lng passed as parameters, this function places a main
+		// marker on the map using the passed position. A custom icon can be set
+		// by passing an url to the mainMarkerIcon option.
+		// 
+		//=====================================================================
 		_placeMainMarker: function(lat, lng){
 			var mo = {};
 			mo.map = this.map;
@@ -156,6 +188,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var marker = new google.maps.Marker(mo);
 		},
+
+		//=====================================================================
+		// _searchPlaces : Private Function
+		//
+		// @params : lat
+		//		Number value containing the latitude coordinate of a position
+		//
+		// @params : lng
+		//		Number value containing the longitude coordinate of a position
+		//
+		// Using Lat and Lng passed as parameters, this function searches for
+		// nearby places (using Google Places API). Types of places can be 
+		// filtered 
+		// 
+		//=====================================================================
 		_searchPlaces: function(lat, lng){
 			req = {};
 			req.location = new google.maps.LatLng(lat, lng);
@@ -167,6 +214,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var service = new google.maps.places.PlacesService(this.map);
 			service.nearbySearch(req, this._placesCallback.bind(this));
 		},
+
+		//=====================================================================
+		// _placesCallback : Private Function
+		//
+		// @params : results
+		//		A JSON object containing all places found.
+		//
+		// @params : status
+		//		Status of the request (successful or not)
+		//
+		// This function creates markers on the map using the information
+		// contained in the JSON object result.
+		// 
+		//=====================================================================
 		_placesCallback: function(results, status){
 			if(status == google.maps.places.PlacesServiceStatus.OK) {
 				for(var i = 0; i < results.length; i++){
@@ -174,6 +235,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 			}
 		},
+
+		//=====================================================================
+		// _createPlaceMarker : Private Function
+		//
+		// @params : place
+		//		A JSON object containing the information of a place (Places API)
+		//
+		// This function filters the places excluding those containing types in
+		// the excludePlacesTypes option. If the place is not excluded, it 
+		// creates a marker and sets the content of the infowindow upon a click.
+		// 
+		//=====================================================================
 		_createPlaceMarker: function(place){
 			var excluded = false;
 
@@ -205,6 +278,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}.bind(this));
 			} 
 		},
+
+		//=====================================================================
+		// _getType : Private Function
+		//
+		// @params : types
+		//		An array containing types of places
+		//
+		// This function return the index of a matched type between the parameter
+		// and the placesTypes option.
+		// 
+		//=====================================================================
 		_getType: function(types){
 			var type = -1;
 
@@ -218,14 +302,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return type;
 		}
 	};
-
-	if (typeof Object.create !== 'function'){
-		Object.create = function (o) {
-			function F(){};
-			F.prototype = o;
-			return new F();
-		}
-	}
 
 	$.fn.whatsnearby = function(options) {
 		if(this.length) {

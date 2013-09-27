@@ -16,6 +16,10 @@
 					width:"100%",
 					address: "32 Saint-Charles Ouest, Longueuil, Qc, Canada"
 				});
+				$("#wn1-1").whatsnearby({ 
+					zoom:15,
+					width:"100%"
+				});
 
 				$("#wn2").whatsnearby({ 
 					zoom:15,
@@ -42,6 +46,10 @@
 			<h2>Simple map</h2>
 			<div class="well">
 				<div id="wn1"></div>
+			</div>
+			<h2>Simple map using data-address attribute</h2>
+			<div class="well">
+				<div id="wn1-1" data-address="Longueuil, Qc"></div>
 			</div>
 			<h2>Showing restaurants, cafes and gyms, 500 meters around the center.</h2>
 			<div class="well">
