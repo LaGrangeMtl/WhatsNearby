@@ -67,6 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			"placesTypes": [],
 			"placesTypesIcon": [],
 			"excludePlacesTypes": [],
+			"excludeByKeywords": [],
 			"placesRadius": 500
 		},
 
@@ -259,6 +260,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					}
 				}
 			};
+
+			for (i = 0; i < this.options.excludeByKeywords.length; i++) {
+				if(place.name.toLowerCase().indexOf(this.options.excludeByKeywords[i].toLowerCase()) >= 0){
+					excluded = true;
+				}
+			}
 
 			if(!excluded){
 				var placeLocation = place.geometry.location;

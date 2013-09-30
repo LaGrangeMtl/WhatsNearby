@@ -52,6 +52,7 @@ options: {
     placesTypes : ['store', 'gym'], //an array of places types
     placesTypesIcon : [], //if set, those images will replace type marker icons (must match placesTypes order)
     excludePlacesTypes : [], //an array of types that will be excluded from the search
+    excludeByKeywords: [], //an array of string that will be excluded from the search (name of the place)
     placesRadius : 500 //the radius, in meters in which Places will be found
 }
 ````
