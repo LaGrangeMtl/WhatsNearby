@@ -71,6 +71,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			"placesRadius": 500
 		},
 
+		_markup: "<div class='infowindow-markup'><strong>{{name}}</strong>{{vicinity}}</div>",
+
 		//=====================================================================
 		// _build : Private Function
 		//
@@ -85,6 +87,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			if($(this.elem).attr("data-address")) {
 				o.address = $(this.elem).attr("data-address");
+			}
+
+			if($(this.elem).html() != "") {
+				this._markup = $(this.elem).html();
+				$(this.elem).html("");
 			}
 
 			if(o.address == "") {
@@ -266,7 +273,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					excluded = true;
 				}
 			}
-
+			
 			if(!excluded){
 				var placeLocation = place.geometry.location;
 				var mo = {};
@@ -278,12 +285,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 
 				var marker = new google.maps.Marker(mo);
+				marker.place = place;
 
 				google.maps.event.addListener(marker, 'click', function(){
-					this.infoWindow.setContent(place.name);
+					this.infoWindow.setContent(this._parseMarkup(marker.place));
 					this.infoWindow.open(this.map, marker);
 				}.bind(this));
-			} 
+			}
+		},
+
+		_parseMarkup: function(place){
+			return this._markup.replace(/{{(.+)}}/g, function(match, placeholder, offset, s){
+				var a = placeholder.split(".");
+				var iterations = a.length;
+				var temp = place;
+				for (var i = 0; i < iterations; i++) {
+					temp = temp[a[i]];
+					if(!temp) break;
+				}
+				return temp ? temp : "";
+			});
 		},
 
 		//=====================================================================
