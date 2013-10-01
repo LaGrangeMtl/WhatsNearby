@@ -266,8 +266,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var mainType = this._getType(place.types);
 
-			console.log(place);
-
 			for (var i = 0; i < this.options.excludePlacesTypes.length; i++) {
 				for(var j = 0; j < place.types.length; j++) {
 					if(this.options.excludePlacesTypes[i] == place.types[j]){
