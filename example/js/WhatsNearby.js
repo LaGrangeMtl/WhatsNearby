@@ -85,12 +85,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			$(this.elem).width(o.width).height(o.height);
 
+			google.maps.visualRefresh = true;
+
 			if($(this.elem).attr("data-address")) {
 				o.address = $(this.elem).attr("data-address");
 			}
 
-			this._markup = $(this.elem).html();
-			$(this.elem).html("");
+			if($(this.elem).html() != "") {
+				this._markup = $(this.elem).html();
+				$(this.elem).html("");
+			}
 
 			if(o.address == "") {
 				this._setupMap(o.lat,o.lng);
@@ -128,7 +132,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//=====================================================================
 		_locationFound: function(results, status){
 			if(status == "OK") {
-				this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
+				if(results[0].geometry.location.nb)
+					this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
+				if(results[0].geometry.location.lb)
+					this._setupMap(results[0].geometry.location.lb, results[0].geometry.location.mb);
 			} else {
 				console.log("An error occured while geocoding the address.");
 			}
@@ -154,6 +161,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			var mapOptions = {
 				zoom:o.zoom,
+				mapTypeId: this.options.mapType,
 				center: new google.maps.LatLng(lat, lng)
 			}
 			this.map = new google.maps.Map(this.elem, mapOptions);
@@ -258,6 +266,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var mainType = this._getType(place.types);
 
+			console.log(place);
+
 			for (var i = 0; i < this.options.excludePlacesTypes.length; i++) {
 				for(var j = 0; j < place.types.length; j++) {
 					if(this.options.excludePlacesTypes[i] == place.types[j]){
@@ -293,7 +303,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		},
 
 		_parseMarkup: function(place){
-			return this._markup.replace(/{{(.+)}}/g, function(match, placeholder, offset, s){
+			return this._markup.replace(/{{([^}]+)}}/g, function(match, placeholder, offset, s){
 				var a = placeholder.split(".");
 				var iterations = a.length;
 				var temp = place;
@@ -326,6 +336,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			return type;
+		},
+
+		resize: function(){
+			google.maps.event.trigger(this.map, "resize");;
 		}
 	};
 
