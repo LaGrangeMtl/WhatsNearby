@@ -300,6 +300,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		},
 
+		//=====================================================================
+		// _parseMarkup : Private Function
+		//
+		// @params : place
+		//		A JSON object containing the information of a place (Places API)
+		//
+		// This function uses the markup passed in the containing div or the
+		// default markup (this._markup) and changes the placeholders to the
+		// relevent variables contained within the places object.
+		//
+		// Any variable can be accessed ex: {{geometry.location.ob}} will return
+		// the latitude of the place object.
+		// 
+		//=====================================================================
 		_parseMarkup: function(place){
 			return this._markup.replace(/{{([^}]+)}}/g, function(match, placeholder, offset, s){
 				var a = placeholder.split(".");
@@ -336,6 +350,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return type;
 		},
 
+		//=====================================================================
+		// resize : Public Function
+		//
+		// This function asks Google API to resize the map (helps with rendering
+		// issues)
+		// 
+		//=====================================================================
 		resize: function(){
 			google.maps.event.trigger(this.map, "resize");;
 		}
