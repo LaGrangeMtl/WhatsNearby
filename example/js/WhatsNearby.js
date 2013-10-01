@@ -67,8 +67,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			"placesTypes": [],
 			"placesTypesIcon": [],
 			"excludePlacesTypes": [],
+			"excludeByKeywords": [],
 			"placesRadius": 500
 		},
+
+		_markup: "<div class='infowindow-markup'><strong>{{name}}</strong>{{vicinity}}</div>",
 
 		//=====================================================================
 		// _build : Private Function
@@ -82,8 +85,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			$(this.elem).width(o.width).height(o.height);
 
+			google.maps.visualRefresh = true;
+
 			if($(this.elem).attr("data-address")) {
 				o.address = $(this.elem).attr("data-address");
+			}
+
+			if($(this.elem).html() != "") {
+				this._markup = $(this.elem).html();
+				$(this.elem).html("");
 			}
 
 			if(o.address == "") {
@@ -122,7 +132,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//=====================================================================
 		_locationFound: function(results, status){
 			if(status == "OK") {
-				this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
+				if(results[0].geometry.location.nb)
+					this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
+				if(results[0].geometry.location.lb)
+					this._setupMap(results[0].geometry.location.lb, results[0].geometry.location.mb);
 			} else {
 				console.log("An error occured while geocoding the address.");
 			}
@@ -148,6 +161,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			var mapOptions = {
 				zoom:o.zoom,
+				mapTypeId: this.options.mapType,
 				center: new google.maps.LatLng(lat, lng)
 			}
 			this.map = new google.maps.Map(this.elem, mapOptions);
@@ -260,6 +274,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 			};
 
+			for (i = 0; i < this.options.excludeByKeywords.length; i++) {
+				if(place.name.toLowerCase().indexOf(this.options.excludeByKeywords[i].toLowerCase()) >= 0){
+					excluded = true;
+				}
+			}
+			
 			if(!excluded){
 				var placeLocation = place.geometry.location;
 				var mo = {};
@@ -271,12 +291,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 
 				var marker = new google.maps.Marker(mo);
+				marker.place = place;
 
 				google.maps.event.addListener(marker, 'click', function(){
-					this.infoWindow.setContent(place.name);
+					this.infoWindow.setContent(this._parseMarkup(marker.place));
 					this.infoWindow.open(this.map, marker);
 				}.bind(this));
-			} 
+			}
+		},
+
+		_parseMarkup: function(place){
+			return this._markup.replace(/{{([^}]+)}}/g, function(match, placeholder, offset, s){
+				var a = placeholder.split(".");
+				var iterations = a.length;
+				var temp = place;
+				for (var i = 0; i < iterations; i++) {
+					temp = temp[a[i]];
+					if(!temp) break;
+				}
+				return temp ? temp : "";
+			});
 		},
 
 		//=====================================================================
@@ -300,6 +334,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			return type;
+		},
+
+		resize: function(){
+			google.maps.event.trigger(this.map, "resize");;
 		}
 	};
 

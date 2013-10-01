@@ -38,6 +38,15 @@
 					placesTypes: [ 'restaurant', 'cafe', 'gym' ],
 					excludePlacesTypes: ['bar']
 				});
+
+				$("#wn4").whatsnearby({ 
+					zoom:15,
+					width:"100%",
+					address: "Montreal",
+					placesRadius: 500,
+					placesTypes: [ 'restaurant', 'cafe', 'gym' ],
+					excludeByKeywords: ['Lounge']
+				});
 			});
 		</script>
 	</head>
@@ -59,6 +68,14 @@
 			<h2>Showing restaurants, cafes and gyms, 500 meters around the center and excluding bars.</h2>
 			<div class="well">
 				<div id="wn3"></div>
+			</div>
+			<h2>Custom markup (inside the initial div)</h2>
+			<div class="well">
+				<div id="wn4">
+					<div class='infowindow-markup'>
+						{{name}}
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
