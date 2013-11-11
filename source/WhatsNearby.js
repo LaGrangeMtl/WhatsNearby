@@ -68,7 +68,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			"placesTypesIcon": [],
 			"excludePlacesTypes": [],
 			"excludeByKeywords": [],
-			"placesRadius": 500
+			"placesRadius": 500,
+			"disableDefaultUI": false,
+			"style": [],
+			"scrollwheel":true,
+			"backgroundColor": "#000000"
 		},
 
 		_markup: "<div class='infowindow-markup'><strong>{{name}}</strong>{{vicinity}}</div>",
@@ -103,7 +107,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			// Fix for maps all scrambled (@$!$ Google...) when using bootstrap
-			$('head').append("<style>#wn * { max-width:none; }</style>");
+			$('head').append("<style>#"+$(this.elem).attr('id')+" * { max-width:none; }</style>");
 		},
 
 		//=====================================================================
@@ -162,9 +166,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var mapOptions = {
 				zoom:o.zoom,
 				mapTypeId: this.options.mapType,
-				center: new google.maps.LatLng(lat, lng)
+				center: new google.maps.LatLng(lat, lng),
+				disableDefaultUI: this.options.disableDefaultUI,
+				backgroundColor: this.options.backgroundColor,
+				scrollwheel: this.options.scrollwheel
 			}
 			this.map = new google.maps.Map(this.elem, mapOptions);
+
+			this.map.set('styles', this.options.style);
 
 			if(o.placeMainMarker) {
 				this._placeMainMarker(lat, lng);
@@ -291,10 +300,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 
 				var marker = new google.maps.Marker(mo);
-				marker.place = place;
+				marker.place = this._parseMarkup(place);
 
 				google.maps.event.addListener(marker, 'click', function(){
-					this.infoWindow.setContent(this._parseMarkup(marker.place));
+					this.infoWindow.setContent(marker.place);
 					this.infoWindow.open(this.map, marker);
 				}.bind(this));
 			}
@@ -358,7 +367,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// 
 		//=====================================================================
 		resize: function(){
-			google.maps.event.trigger(this.map, "resize");;
+			google.maps.event.trigger(this.map, "resize");
 		}
 	};
 
