@@ -136,10 +136,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//=====================================================================
 		_locationFound: function(results, status){
 			if(status == "OK") {
-				if(results[0].geometry.location.nb)
-					this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
-				if(results[0].geometry.location.lb)
-					this._setupMap(results[0].geometry.location.lb, results[0].geometry.location.mb);
+				this._setupMap(results[0].geometry.location.lat(), results[0].geometry.location.lng());
 			} else {
 				console.log("An error occured while geocoding the address.");
 			}
