@@ -67,8 +67,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			"placesTypes": [],
 			"placesTypesIcon": [],
 			"excludePlacesTypes": [],
-			"placesRadius": 500
+			"excludeByKeywords": [],
+			"placesRadius": 500,
+			"disableDefaultUI": false,
+			"style": [],
+			"scrollwheel":true,
+			"backgroundColor": "#000000"
 		},
+
+		_markup: "<div class='infowindow-markup'><strong>{{name}}</strong>{{vicinity}}</div>",
 
 		//=====================================================================
 		// _build : Private Function
@@ -82,8 +89,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			$(this.elem).width(o.width).height(o.height);
 
+			google.maps.visualRefresh = true;
+
 			if($(this.elem).attr("data-address")) {
 				o.address = $(this.elem).attr("data-address");
+			}
+
+			if($(this.elem).html() != "") {
+				this._markup = $(this.elem).html();
+				$(this.elem).html("");
 			}
 
 			if(o.address == "") {
@@ -93,7 +107,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			// Fix for maps all scrambled (@$!$ Google...) when using bootstrap
-			$('head').append("<style>#wn * { max-width:none; }</style>");
+			$('head').append("<style>#"+$(this.elem).attr('id')+" * { max-width:none; }</style>");
 		},
 
 		//=====================================================================
@@ -122,7 +136,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//=====================================================================
 		_locationFound: function(results, status){
 			if(status == "OK") {
-				this._setupMap(results[0].geometry.location.nb, results[0].geometry.location.ob);
+				this._setupMap(results[0].geometry.location.lat(), results[0].geometry.location.lng());
 			} else {
 				console.log("An error occured while geocoding the address.");
 			}
@@ -148,9 +162,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var o = this.options;
 			var mapOptions = {
 				zoom:o.zoom,
-				center: new google.maps.LatLng(lat, lng)
+				mapTypeId: this.options.mapType,
+				center: new google.maps.LatLng(lat, lng),
+				disableDefaultUI: this.options.disableDefaultUI,
+				backgroundColor: this.options.backgroundColor,
+				scrollwheel: this.options.scrollwheel
 			}
 			this.map = new google.maps.Map(this.elem, mapOptions);
+
+			this.map.set('styles', this.options.style);
 
 			if(o.placeMainMarker) {
 				this._placeMainMarker(lat, lng);
@@ -260,6 +280,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 			};
 
+			for (i = 0; i < this.options.excludeByKeywords.length; i++) {
+				if(place.name.toLowerCase().indexOf(this.options.excludeByKeywords[i].toLowerCase()) >= 0){
+					excluded = true;
+				}
+			}
+			
 			if(!excluded){
 				var placeLocation = place.geometry.location;
 				var mo = {};
@@ -271,12 +297,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 
 				var marker = new google.maps.Marker(mo);
+				marker.place = this._parseMarkup(place);
 
 				google.maps.event.addListener(marker, 'click', function(){
-					this.infoWindow.setContent(place.name);
+					this.infoWindow.setContent(marker.place);
 					this.infoWindow.open(this.map, marker);
 				}.bind(this));
-			} 
+			}
+		},
+
+		//=====================================================================
+		// _parseMarkup : Private Function
+		//
+		// @params : place
+		//		A JSON object containing the information of a place (Places API)
+		//
+		// This function uses the markup passed in the containing div or the
+		// default markup (this._markup) and changes the placeholders to the
+		// relevent variables contained within the places object.
+		//
+		// Any variable can be accessed ex: {{geometry.location.ob}} will return
+		// the latitude of the place object.
+		// 
+		//=====================================================================
+		_parseMarkup: function(place){
+			return this._markup.replace(/{{([^}]+)}}/g, function(match, placeholder, offset, s){
+				var a = placeholder.split(".");
+				var iterations = a.length;
+				var temp = place;
+				for (var i = 0; i < iterations; i++) {
+					temp = temp[a[i]];
+					if(!temp) break;
+				}
+				return temp ? temp : "";
+			});
 		},
 
 		//=====================================================================
@@ -300,6 +354,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			return type;
+		},
+
+		//=====================================================================
+		// resize : Public Function
+		//
+		// This function asks Google API to resize the map (helps with rendering
+		// issues)
+		// 
+		//=====================================================================
+		resize: function(){
+			google.maps.event.trigger(this.map, "resize");
 		}
 	};
 
