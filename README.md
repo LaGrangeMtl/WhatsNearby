@@ -54,5 +54,17 @@ options: {
     excludePlacesTypes : [], //an array of types that will be excluded from the search
     excludeByKeywords: [], //an array of string that will be excluded from the search (name of the place)
     placesRadius : 500 //the radius, in meters in which Places will be found
-}
+    disableDefaultUI: false,
+    style: [], // pasted from https://snazzymaps.com/
+    draggable:true, // Can you drag the map around
+    scrollwheel:true, // Deactivate scrollwheel (very useful for mobile users!)
+    backgroundColor: "#000000", // Background color under the map
+    markercluster: false, // requires markercluster.js
+    markerclusterStyles: [], // requires markercluster.js
+    markerclusterOptions: {}, // requires markercluster.js
+    centerOffsetX: 0, // offsets the center of the map
+    centerOffsetY: 0,
+    useInfoBox: false, // uses InfoBox to customize Info Windows
+    infoBoxOptions: {}
+},
 ````
