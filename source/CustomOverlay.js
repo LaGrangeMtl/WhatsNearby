@@ -1,7 +1,6 @@
 'format es6';
 'use strict';
 
-import { docReady } from '../Utils';
 import $ from 'jquery';
 
 const google = window.google;

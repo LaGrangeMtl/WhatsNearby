@@ -11,7 +11,6 @@ Dependencies
 - [jQuery](http://jquery.com)
 - [Google Maps Javascript API v3](https://developers.google.com/maps/documentation/javascript/)
 - [Google Places API](https://developers.google.com/places/)
-- [ES5 Shim and Sham](https://github.com/kriskowal/es5-shim)
 
 Basic usage
 -----------
