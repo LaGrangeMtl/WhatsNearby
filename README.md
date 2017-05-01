@@ -67,3 +67,19 @@ options: {
     infoBoxOptions: {}
 },
 ````
+
+
+To show custom markers overlayed on the map, use the Custom Overlay helper :
+
+```
+Sample marker:
+    {
+        id: int,
+        location: {
+            lat: float,
+            lng: float,
+            latlng: google.maps.LatLng
+        }
+    }
+```
+```const OverlayMap = new CustomOverlay({ map: wn.map }, markersList, null, onClickMarker);```
