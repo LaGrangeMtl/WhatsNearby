@@ -43,6 +43,7 @@ function WhatsNearby() {
 		placeMainMarker: true,
 		mainMarkerIcon: '',
 		markers: [],
+		placesName: [], /* use name or type, usually not both */
 		placesTypes: [],
 		placesTypesIcon: [],
 		excludePlacesTypes: [],
@@ -379,15 +380,18 @@ function WhatsNearby() {
 	//      Number value containing the longitude coordinate of a position
 	//
 	// Using Lat and Lng passed as parameters, this function searches for
-	// nearby places (using Google Places API). Types of places can be
-	// filtered
+	// nearby places (using Google Places API). Places can be
+	// filtered by Type and/or Name
 	//
 	//=====================================================================
 	this._searchPlaces = (lat, lng) => {
 		const req = {};
 		req.location = new google.maps.LatLng(lat, lng);
 		req.radius = this.options.placesRadius;
-		req.types = this.options.placesTypes;
+		if (this.options.placesTypes)
+			req.types = this.options.placesTypes;
+		if (this.options.placesNames)
+			req.name = this.options.placesNames;
 
 		this.infoWindow = new google.maps.InfoWindow();
 
